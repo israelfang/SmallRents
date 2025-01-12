@@ -1,4 +1,4 @@
-package com.example.smallrents.ui.theme
+package com.smallrents.ui.theme
 
 import android.app.Activity
 import android.os.Build

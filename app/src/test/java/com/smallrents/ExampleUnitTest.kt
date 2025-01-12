@@ -1,4 +1,4 @@
-package com.example.smallrents
+package com.smallrents
 
 import org.junit.Test
 
