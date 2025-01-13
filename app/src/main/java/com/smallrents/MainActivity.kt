@@ -1,5 +1,6 @@
 package com.smallrents
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,30 +19,32 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SmallRentsTheme {
-                Scaffold( modifier = Modifier.fillMaxSize() ) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            SmallRentsApp()
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun SmallRentsApp() {
+    SmallRentsTheme {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+        ) { innerPadding ->
+            Text(
+                modifier = Modifier.padding(innerPadding),
+                text = "SmallRents"
+            )
+        }
+    }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    name = "Light Mode"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark Mode"
+)
 @Composable
-fun GreetingPreview() {
-    SmallRentsTheme {
-        Greeting("Android")
-    }
+fun SmallRentsAppPreview() {
+    SmallRentsApp()
 }
