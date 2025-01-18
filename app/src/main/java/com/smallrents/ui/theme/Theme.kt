@@ -1,15 +1,11 @@
 package com.smallrents.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -18,19 +14,50 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = BlueConstruction,
+    onPrimary = WhiteConstruction,
+    primaryContainer = WhiteConstruction,
+    onPrimaryContainer = DarkWhiteConstruction,
+   // inversePrimary = Red,
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = OrangeConstruction,
+    onSecondary = WhiteConstruction,
+   // secondaryContainer = Red,
+   // onSecondaryContainer = Red,
+
+    tertiary = YellowConstruction,
+    onTertiary = WhiteConstruction,
+  // tertiaryContainer = Red,
+   // onTertiaryContainer = Red,
+
+    background = Color(0xFFfcf8f9),
+    //onBackground = Red,
+
+    surface = WhiteConstruction,
+/*    onSurface = Red,
+    surfaceVariant = Red,
+    onSurfaceVariant = Red,
+    surfaceTint = Red,
+   inverseSurface =Red,
+   inverseOnSurface = Red,*/
+//
+//    error = generateRandomColor(),
+//    onError = generateRandomColor(),
+//    errorContainer = generateRandomColor(),
+//    onErrorContainer = generateRandomColor(),
+//
+//    outline = generateRandomColor(),
+//    outlineVariant = generateRandomColor(),
+//
+/*    scrim = Red,
+//
+    surfaceBright =Red,
+    surfaceContainer = Red,
+    surfaceContainerHigh = Red,*/
+    surfaceContainerHighest = Color(0xFFe5e2e2),
+   // surfaceContainerLow = Red,
+   //surfaceContainerLowest = Red,
+  //surfaceDim = Red,
 )
 
 @Composable
@@ -41,10 +68,10 @@ fun SmallRentsTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-      dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+      /*dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
         val context = LocalContext.current
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      }
+      }*/
       darkTheme -> DarkColorScheme
       else -> LightColorScheme
     }
