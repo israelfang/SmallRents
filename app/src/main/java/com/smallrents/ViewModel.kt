@@ -3,6 +3,7 @@ package com.smallrents
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -11,15 +12,15 @@ import retrofit2.Callback
 import retrofit2.Response
 
 data class RegistrationUiState(
-    val name: String = "",
-    val gender: String = "",
-    val birthDate: String = "",
-    val cpf: String = "",
-    val cep: String = "",
-    val street: String = "",
-    val number: String = "",
-    val complement: String = "",
-    val registrationStatus: RegistrationStatus = RegistrationStatus.Idle
+    val name: String = "Israel",
+    val gender: String = "Masculino",
+    val birthDate: String = "2020-01-18T14:24:58.766Z",
+    val cpf: String = "41789961858",
+    val cep: String = "04444000",
+    val street: String = "Av. Miguel Yunes",
+    val number: String = "232",
+    val complement: String = "Ap. 12",
+    //val registrationStatus: RegistrationStatus = RegistrationStatus.Idle
 )
 
 
@@ -32,11 +33,9 @@ sealed class RegistrationStatus {
 
 class RegistrationViewModel : ViewModel() {
 
-    // Expose screen UI state
     private val _uiState = MutableStateFlow(RegistrationUiState())
     val uiState: StateFlow<RegistrationUiState> = _uiState
 
-    // Function to update username
     fun onUsernameChange(newUsername: String) {
         _uiState.value = _uiState.value.copy(name = newUsername)
     }
@@ -70,12 +69,10 @@ class RegistrationViewModel : ViewModel() {
     }
 
 
-    // Function to handle registration
     fun register() {
 
-        // Simulate network request
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Loading)
+            //_uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Loading)
 
             Log.i("DataTest", "name: ${_uiState.value.name}")
             Log.i("DataTest", "gender: ${_uiState.value.gender}")
@@ -87,34 +84,35 @@ class RegistrationViewModel : ViewModel() {
             Log.i("DataTest", "complement: ${_uiState.value.complement}")
 
 
-           /* try {
-                // Simulate API call (replace with actual API call logic)
-                val response = fakeApiCall(_uiState.value.username, _uiState.value.email, _uiState.value.password)
-                if (response) {
-                    _uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Success)
-                } else {
-                    _uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Error("Registration failed"))
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Error("An error occurred"))
-            }*/
-
+            val request = RegistrationRequest(
+                nome = _uiState.value.name,
+                sexo = _uiState.value.gender,
+                data_Nascimento = _uiState.value.birthDate,
+                cpf = _uiState.value.cpf,
+                cep = _uiState.value.cep.toInt(),
+                logradouro = _uiState.value.street,
+                numero = _uiState.value.number.toInt(),
+                complemento = _uiState.value.complement
+            )
+            val gson = Gson()
+            val requestJson = gson.toJson(request)
+            Log.d("RequestBody", "JSON: $requestJson")
 
             val apiService = RetrofitClient.instance
 
-            // Making a network call
-            apiService.getUsers().enqueue(object : Callback<RegistrationModelEntity> {
-                override fun onResponse(call: Call<RegistrationModelEntity>, response: Response<RegistrationModelEntity>) {
+            apiService.userRegistration(request).enqueue(object : Callback<RegistrationResponse> {
+                override fun onResponse(call: Call<RegistrationResponse>, response: Response<RegistrationResponse>) {
                     if (response.isSuccessful) {
-                        val users = response.body()
-                        Log.d("Retrofit", "Fetched Users: $users")
+                        val responseBody = response.body()
+                        Log.d("Retrofit", "Success response body: $responseBody")
                     } else {
                         Log.e("Retrofit", "Error: ${response.code()}")
+                        Log.e("Retrofit", "Error: $response")
                     }
                 }
 
-                override fun onFailure(p0: Call<RegistrationModelEntity>, p1: Throwable) {
-                    TODO("Not yet implemented")
+                override fun onFailure(p0: Call<RegistrationResponse>, p1: Throwable) {
+                    Log.e("Retrofit", "Failure to fetch users: ${p1.message}")
                 }
             })
         }
