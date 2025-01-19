@@ -5,24 +5,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -33,10 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.evaluateCubic
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,14 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.smallrents.ui.theme.SmallRentsTheme
 import com.smallrents.ui.theme.nunitoFamily
-import com.smallrents.ui.theme.robotoFamily
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +100,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
             }
 
         ) { innerPadding ->
-
             val uiState = viewModel.uiState.collectAsState().value
             Column(
                 modifier = Modifier
@@ -133,7 +123,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     )
                 }
 
-
                 TextField(
                     modifier = Modifier
                         .padding(start = 30.dp, end = 30.dp)
@@ -145,18 +134,58 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     singleLine = true
                 )
 
+                val options = listOf("Masculino", "Femino")
+                var expanded by remember { mutableStateOf(false) }
+                var text by remember { mutableStateOf("") }
 
-                TextField(
+                ExposedDropdownMenuBox(
                     modifier = Modifier
                         .padding(start = 30.dp, end = 30.dp)
                         .fillMaxWidth(),
-                    value = uiState.gender,
-                    onValueChange = { viewModel.onGenderChange(it) },
-                    label = { Text("Sexo") },
-                    placeholder = { Text("Masculino") },
-                    singleLine = true
-                )
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                ) {
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                        value = text,
+                        onValueChange = {},
+                        readOnly = true,
+                        singleLine = true,
+                        label = { Text("Sexo") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
 
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        options.forEachIndexed { index, option ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        option,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                onClick = {
+                                    text = option
+                                    expanded = false
+                                    viewModel.onGenderChange(
+                                        when (index) {
+                                            0 -> "M"
+                                            1 -> "F"
+                                            else -> "M"
+                                        }
+                                    )
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
 
                 TextField(
                     modifier = Modifier
@@ -169,7 +198,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     singleLine = true
                 )
 
-
                 TextField(
                     modifier = Modifier
                         .padding(start = 30.dp, end = 30.dp)
@@ -180,7 +208,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     placeholder = { Text("417.899.618-58") },
                     singleLine = true
                 )
-
 
                 TextField(
                     modifier = Modifier
@@ -193,7 +220,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     singleLine = true
                 )
 
-
                 TextField(
                     modifier = Modifier
                         .padding(start = 30.dp, end = 30.dp)
@@ -205,7 +231,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     singleLine = true
                 )
 
-
                 TextField(
                     modifier = Modifier
                         .padding(start = 30.dp, end = 30.dp)
@@ -216,7 +241,6 @@ fun SmallRentsApp(viewModel: RegistrationViewModel = RegistrationViewModel()) {
                     placeholder = { Text("300") },
                     singleLine = true
                 )
-
 
                 TextField(
                     modifier = Modifier

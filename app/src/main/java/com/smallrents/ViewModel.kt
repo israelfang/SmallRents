@@ -10,19 +10,21 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 data class RegistrationUiState(
-    val name: String = "Israel",
-    val gender: String = "Masculino",
-    val birthDate: String = "2020-01-18T14:24:58.766Z",
-    val cpf: String = "41789961858",
-    val cep: String = "04444000",
-    val street: String = "Av. Miguel Yunes",
-    val number: String = "232",
-    val complement: String = "Ap. 12",
-    //val registrationStatus: RegistrationStatus = RegistrationStatus.Idle
+    val name: String = "",
+    val gender: String = "",
+    val birthDate: String = "",
+    val cpf: String = "",
+    val cep: String = "",
+    val street: String = "",
+    val number: String = "",
+    val complement: String = "",
+    val registrationStatus: RegistrationStatus = RegistrationStatus.Idle
 )
-
 
 sealed class RegistrationStatus {
     data object Idle : RegistrationStatus()
@@ -69,34 +71,45 @@ class RegistrationViewModel : ViewModel() {
     }
 
 
+    fun formatToISO8601(dateString: String): String {
+        val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy") // Input format
+        val localDate = LocalDate.parse(dateString, inputFormatter)
+
+        val localDateTime = localDate.atStartOfDay()
+        return localDateTime.atZone(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)
+    }
+
+
     fun register() {
 
         viewModelScope.launch {
-            //_uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Loading)
+            _uiState.value = _uiState.value.copy(registrationStatus = RegistrationStatus.Loading)
 
-            Log.i("DataTest", "name: ${_uiState.value.name}")
-            Log.i("DataTest", "gender: ${_uiState.value.gender}")
-            Log.i("DataTest", "birthDate: ${_uiState.value.birthDate}")
-            Log.i("DataTest", "cpf: ${_uiState.value.cpf}")
-            Log.i("DataTest", "cep: ${_uiState.value.cep}")
-            Log.i("DataTest", "street: ${_uiState.value.street}")
-            Log.i("DataTest", "number: ${_uiState.value.number}")
-            Log.i("DataTest", "complement: ${_uiState.value.complement}")
+            val formattedDate = formatToISO8601(_uiState.value.birthDate)
 
+            Log.i("Retrofit", "name: ${_uiState.value.name}")
+            Log.i("Retrofit", "gender: ${_uiState.value.gender}")
+            Log.i("Retrofit", "birthDate: ${formattedDate}")
+            Log.i("Retrofit", "cpf: ${_uiState.value.cpf}")
+            Log.i("Retrofit", "cep: ${_uiState.value.cep}")
+            Log.i("Retrofit", "street: ${_uiState.value.street}")
+            Log.i("Retrofit", "number: ${_uiState.value.number}")
+            Log.i("Retrofit", "complement: ${_uiState.value.complement}")
 
             val request = RegistrationRequest(
                 nome = _uiState.value.name,
                 sexo = _uiState.value.gender,
-                data_Nascimento = _uiState.value.birthDate,
+                data_Nascimento = formattedDate,
                 cpf = _uiState.value.cpf,
                 cep = _uiState.value.cep.toInt(),
                 logradouro = _uiState.value.street,
                 numero = _uiState.value.number.toInt(),
                 complemento = _uiState.value.complement
             )
+
             val gson = Gson()
             val requestJson = gson.toJson(request)
-            Log.d("RequestBody", "JSON: $requestJson")
+            Log.d("Retrofit", "JSON: $requestJson")
 
             val apiService = RetrofitClient.instance
 
@@ -105,6 +118,7 @@ class RegistrationViewModel : ViewModel() {
                     if (response.isSuccessful) {
                         val responseBody = response.body()
                         Log.d("Retrofit", "Success response body: $responseBody")
+
                     } else {
                         Log.e("Retrofit", "Error: ${response.code()}")
                         Log.e("Retrofit", "Error: $response")
